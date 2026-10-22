@@ -3,11 +3,14 @@
 import argparse
 import hashlib
 import json
+import re
+from html import escape
 import shutil
 import subprocess
 import tempfile
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 UPSTREAM_URL = 'https://github.com/op7418/guizang-ppt-skill.git'
 UPSTREAM_REVISION = 'c91369c449d34755d320a8b81d0734000d99d1ab'
@@ -87,10 +90,116 @@ class SlideCounter(HTMLParser):
     def __init__(self):
         super().__init__()
         self.count = 0
+        self.images = []
 
     def handle_starttag(self, tag, attrs):
+        if tag == 'img':
+            self.images.append(dict(attrs).get('src', ''))
         if tag == 'section' and 'slide' in dict(attrs).get('class', '').split():
             self.count += 1
+
+
+def load_plan(path, expected_sha=None):
+    plan = json.loads(path.read_text(encoding='utf-8'))
+    if not isinstance(plan, dict) or plan.get('style') not in ('magazine', 'swiss'):
+        raise ValueError('Plan style must be magazine or swiss.')
+    if expected_sha is not None and plan.get('source_sha256') != expected_sha:
+        raise ValueError('Presentation plan does not match the revised article; regenerate the plan.')
+    slides = plan.get('slides')
+    if not isinstance(slides, list) or not slides:
+        raise ValueError('Presentation plan needs at least one authored slide.')
+    images = plan.get('images', [])
+    if not isinstance(images, list):
+        raise ValueError('Plan images must be an array.')
+    names = set()
+    for image in images:
+        if not isinstance(image, dict) or not isinstance(image.get('source'), str) or not isinstance(image.get('name'), str):
+            raise ValueError('Each image needs source and name.')
+        name = image['name']
+        if not name or name in ('.', '..') or '/' in name or '\\' in name or name in names:
+            raise ValueError('Image names must be unique filenames without path separators.')
+        names.add(name)
+        if not (path.parent / image['source']).resolve().is_file():
+            raise ValueError(f'Plan image source missing: {image["source"]}')
+    ids = set()
+    for slide in slides:
+        if not isinstance(slide, dict):
+            raise ValueError('Every slide must be an object.')
+        identifier = slide.get('id', '')
+        if not isinstance(identifier, str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', identifier) or identifier in ids:
+            raise ValueError('Every slide needs a unique lowercase semantic id.')
+        ids.add(identifier)
+        for field in ('title', 'content_html', 'classes'):
+            if not isinstance(slide.get(field), str) or not slide[field].strip():
+                raise ValueError(f'Slide {identifier}: {field} is required.')
+        body = SlideCounter()
+        body.feed(slide['content_html'])
+        if body.count or re.search(r'</?section\b', slide['content_html'], re.I):
+            raise ValueError('content_html must contain the slide interior, not section wrappers.')
+        note = slide.get('notes')
+        if not isinstance(note, dict) or any(not isinstance(note.get(field), str) or not note[field].strip() for field in ('purpose', 'transition')):
+            raise ValueError(f'Slide {identifier}: notes need purpose and transition.')
+        talk = note.get('talk')
+        if not isinstance(talk, list) or not talk or any(not isinstance(item, str) or not item.strip() for item in talk):
+            raise ValueError(f'Slide {identifier}: notes need non-empty talk items.')
+        if plan['style'] == 'swiss' and not re.fullmatch(r'S(?:0[1-9]|1[0-9]|2[0-2])|SWISS-(?:COVER|CLOSING)-ASCII', str(slide.get('layout', ''))):
+            raise ValueError(f'Slide {identifier}: registered Swiss layout is required.')
+    return plan
+
+
+def render(directory, plan_path):
+    manifest_path = directory / 'presentation.json'
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+    plan = load_plan(plan_path, manifest['article_sha256'])
+    if plan['style'] != manifest['style']:
+        raise ValueError('Presentation plan style differs from the prepared template.')
+    index = directory / 'index.html'
+    html = index.read_text(encoding='utf-8')
+    if html.count('<!-- SLIDES_HERE -->') != 1 or 'const SPEAKER_NOTES = [];' not in html:
+        raise ValueError('Template is already authored or has changed; prepare a new output directory.')
+    copies = []
+    for image in plan.get('images', []):
+        source = (plan_path.parent / image['source']).resolve()
+        target = directory / 'images' / image['name']
+        if target.exists() and target.read_bytes() != source.read_bytes():
+            raise ValueError(f'Image target already differs: {target}')
+        copies.append((source, target))
+    declared = {f'images/{image["name"]}' for image in plan.get('images', [])}
+    for slide in plan['slides']:
+        body = SlideCounter()
+        body.feed(slide['content_html'])
+        for src in body.images:
+            url = urlsplit(src)
+            if url.scheme or url.netloc:
+                continue
+            relative = unquote(url.path)
+            target = (directory / relative).resolve()
+            if not relative or not target.is_relative_to(directory.resolve()) or (relative not in declared and not target.is_file()):
+                raise ValueError(f'Presentation image missing or outside deck: {src}')
+    for source, target in copies:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if source != target.resolve():
+            shutil.copy2(source, target)
+    sections, notes, outline = [], [], ['# 演示大纲', '']
+    for slide in plan['slides']:
+        attrs = {'class': 'slide ' + slide['classes'], 'data-slide-id': slide['id'], 'data-title': slide['title']}
+        if slide.get('layout'):
+            attrs['data-layout'] = slide['layout']
+        if slide.get('animation'):
+            attrs['data-animate'] = slide['animation']
+        attributes = ' '.join(f'{key}="{escape(str(value), quote=True)}"' for key, value in attrs.items())
+        sections.append(f"<section {attributes}>\n{slide['content_html']}\n</section>")
+        note = dict(slide['notes'], id=slide['id'], title=slide['title'])
+        notes.append(note)
+        outline.extend([f"## {slide['title']} ({slide['id']})", f"目的：{note['purpose']}", f"版式：{slide.get('layout', slide['classes'])}", *[f'- {item}' for item in note['talk']], f"转场：{note['transition']}", ''])
+    notes_json = json.dumps(notes, ensure_ascii=False).replace('<', r'\u003c')
+    html = html.replace('<!-- SLIDES_HERE -->', '\n'.join(sections))
+    html = html.replace('const SPEAKER_NOTES = [];', f'const SPEAKER_NOTES = {notes_json};')
+    index.write_text(html, encoding='utf-8')
+    (directory / 'outline.md').write_text('\n'.join(outline), encoding='utf-8')
+    (directory / 'slides-plan.json').write_text(json.dumps(plan, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    manifest['status'] = 'authored_not_validated'
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
 def validate(directory):
@@ -125,6 +234,9 @@ def main():
     stage.add_argument('--input', type=Path, required=True)
     stage.add_argument('--output-dir', type=Path, required=True)
     stage.add_argument('--style', choices=['magazine', 'swiss'], default='magazine')
+    author = commands.add_parser('render', help='Assemble authored slides and notes from a source-bound JSON plan')
+    author.add_argument('--directory', type=Path, required=True)
+    author.add_argument('--plan', type=Path, required=True)
     check = commands.add_parser('validate')
     check.add_argument('--directory', type=Path, required=True)
     args = parser.parse_args()
@@ -135,9 +247,12 @@ def main():
         elif args.command == 'prepare':
             prepare(args.upstream.resolve(), args.input.resolve(), args.output_dir.resolve(), args.style)
             print(f'Scaffold prepared, slides not yet authored: {args.output_dir.resolve()}')
+        elif args.command == 'render':
+            render(args.directory.resolve(), args.plan.resolve())
+            print('Slides and speaker notes authored; validation remains required.')
         else:
             validate(args.directory.resolve())
-    except (ValueError, OSError, subprocess.CalledProcessError) as error:
+    except (ValueError, OSError, KeyError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'{error}\n')
 
 

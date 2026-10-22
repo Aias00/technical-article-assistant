@@ -2,7 +2,7 @@
 
 ## 按需交付
 
-不强制每个简单请求产生全部文件。只核稿交付review.md；仅排版交付HTML；完整处理或用户要求可追溯稿件包时，使用：
+不强制每个简单请求产生全部文件。只核稿交付review.md；仅排版交付HTML；默认联合交付或用户要求可追溯稿件包时，使用：
 
 ```text
 <output>/
@@ -14,6 +14,12 @@
   inspection.json    本地检查报告
   meta.json          标题、文种、来源文件和交付状态
   images/            实际使用且获准复制的图片（可选）
+  slides-plan.json   从修订稿编写的页面与讲稿计划
+  slides/
+    index.html       实际网页PPT（不能是空模板）
+    outline.md       逐页大纲与讲稿要点
+    presentation.json 来源摘要、风格与演示检查状态
+    LICENSE、NOTICE.md、upstream-source/ 上游授权及对应源码
 ```
 
 原始稿件保留原路径；用户有article.md时，以它为输入，revised.md为本次修订结果，不再来回修改两个主稿。用户要求回写原文件时再按其指令执行。
@@ -43,7 +49,8 @@
   "sources": "sources.md",
   "verification": "verification.md",
   "inspection": "inspection.json",
-  "targets": ["wechat"],
+  "targets": ["wechat", "html-slides"],
+  "presentation": {"index": "slides/index.html", "status": "pending"},
   "publication": {"status": "not_requested"}
 }
 ```

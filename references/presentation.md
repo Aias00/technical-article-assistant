@@ -7,7 +7,7 @@
 输入：revised.md、受众、场合、风格、可选时长/页数及图像。只要求转演示时保留原稿；用户已有大纲时复用。没有指定风格时用magazine，有明确科技/工程数据汇报需求可推荐swiss；说明选择，缺少的信息不影响初稿时按保守假设继续。
 输出：slides/outline.md、slides/index.html、图片与本地动效资源、讲稿备注、presentation.json，以及上游LICENSE、NOTICE.md和对应源码。素材或环境未验证处写入交付说明。
 
-先基于原稿拟定outline.md：每页稳定ID、页面目的、主张/证据、选用版式、讲稿要点、转场及可选时长。不把文章按段落机械拆页，不虚构数据做大字报；保留待核实标记。演示模式不自动额外生成公众号HTML。
+先基于原稿拟定outline.md：每页稳定ID、页面目的、主张/证据、选用版式、讲稿要点、转场及可选时长。不把文章按段落机械拆页，不虚构数据做大字报；保留待核实标记。仅演示模式不额外生成公众号HTML；默认联合交付同时生成文章HTML。
 
 ## 固定依赖安装与模板准备
 
@@ -30,7 +30,7 @@ prepare只生成工作骨架，**不能作为完成交付**。source-article.md�
 - 两者均读取references/presenter-mode.md和checklist.md，保留现有运行时。
 - 原始截图需保真时读取screenshot-framing.md；默认使用用户素材，不自动调用付费配图或生成图片。
 
-在index.html的SLIDES_HERE区加入实际section.slide；每页有data-slide-id。为每页填写SPEAKER_NOTES，ID与页面顺序一致，包含title、purpose、3–5条talk和transition；已知时长才填minutes，不捏造现场信息。不要把项目赞助信息放入演示正文。
+按joint-delivery.md生成slides-plan.json后使用`presentation.py render --directory /abs/slides --plan /abs/slides-plan.json`装配实际section.slide和讲稿，也可由宿主直接编辑。每页有data-slide-id。为每页填写SPEAKER_NOTES，ID与页面顺序一致，包含title、purpose、3–5条talk和transition；已知时长才填minutes，不捏造现场信息。不要把项目赞助信息放入演示正文。
 按上游模板、主题与版式调整布局，保留键盘翻页、总览、P演讲模式与B低功耗。不删JS来消除检查失败；用户要静态版时另行说明能力变化。图片复制到slides/images并更新路径，不拷贝原稿目录里的无关资料。
 
 ## 验证与交付

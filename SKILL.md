@@ -1,11 +1,11 @@
 ---
 name: technical-article-assistant
-description: 审稿、核稿、润色技术文章及公众号排版，将 Markdown 转微信公众号 HTML。用于技术宣传稿、工程实践和架构分享的 review、polish、Markdown-to-WeChat formatting，可留存来源与代码验证记录，支持技术稿转杂志风/瑞士风网页PPT（HTML slides），交付问题清单、修订稿、排版文件或演示文稿。
+description: 从主题、资料或初稿生成技术文章与配套网页PPT，默认同时交付Markdown、公众号HTML、杂志风或瑞士风演示及讲稿。也支持独立审稿、核稿、润色和Markdown-to-WeChat formatting，留存来源与代码验证记录。
 ---
 
 # 技术文稿核稿与排版助手
 
-一个技能完成核稿、修订、检查、排版及可选网页演示。AI语义审阅由宿主执行，本地脚本提供文风检查和HTML生成，不需要调用其他技能。
+一个技能默认完成文章与配套网页PPT的联合交付，核稿、修订、排版和演示共用一份修订稿。AI语义审阅由宿主执行，本地脚本提供文风检查和HTML生成，不需要调用其他技能。
 
 ## 选择模式
 
@@ -13,15 +13,20 @@ description: 审稿、核稿、润色技术文章及公众号排版，将 Markdo
 |---|---|---|
 | 只审不改、找问题 | 只核稿 | review.md |
 | 审稿并修改、润色 | 核稿修订 | review.md、revised.md |
-| 核稿并排版、生成完整稿件包 | 完整处理（未指定时默认） | review.md、revised.md、article.html |
+| 写文章、完整处理、文章和PPT一起输出 | 联合交付（未指定时默认） | review.md、revised.md、article.html、slides/index.html、演示大纲及讲稿 |
+| 只要文章、不需要PPT | 文章处理 | review.md、revised.md、article.html |
 | 只排版、原文不要改 | 仅排版 | article.html，保留原文措辞 |
 | 文章转PPT、技术分享演示、杂志风/瑞士风slides | 网页演示 | slides/outline.md、index.html、讲稿及依赖 |
 
-输入是Markdown文件或用户提供的正文；可附目标读者、修改边界、证据、主题和封面。缺省按中文技术分享稿处理。原文保留，所有交付写入独立输出目录；已有同名文件先读取，避免覆盖其他任务产物。
+输入是主题、资料URL、Markdown文件或用户提供的正文；主题/URL输入先搜集允许访问的资料成稿，不能凭空生成技术事实。可附目标读者、修改边界、证据、主题和封面。缺省按中文技术分享稿处理。原文保留，所有交付写入独立输出目录；已有同名文件先读取，避免覆盖其他任务产物。
+
+## 默认联合交付
+
+用户未限定单项模式时，读取 [联合交付流程](references/joint-delivery.md)，直接完成文章与配套网页PPT，不只准备模板或给操作步骤。先核稿修订，再从revised.md编写演示计划，一次装配文章HTML、实际幻灯片与逐页讲稿，分别核验后给出成品路径。依赖或校验受阻时明确“部分完成”，不能只输出文章却声称全部完成。
 
 ## 来源与验证记录
 
-完整处理或用户要求可追溯稿件包时，按 [稿件包规范](references/article-package.md) 保存sources.md、verification.md和meta.json；简单核稿或仅排版不强制增加文件。来源留存只记录实际读取的资料，版本、源码位置、检索时间与主张对应；另存修订稿时保持图片路径有效。
+联合交付、文章处理或用户要求可追溯稿件包时，按 [稿件包规范](references/article-package.md) 保存sources.md、verification.md和meta.json；简单核稿或仅排版不强制增加文件。来源留存只记录实际读取的资料，版本、源码位置、检索时间与主张对应；另存修订稿时保持图片路径有效。
 
 代码或配置支撑主要结论时，读取 [代码验证规范](references/code-verification.md)：核对固定版本与实际输出，有工具及合适环境时实跑可执行示例；伪代码与不可执行片段分别注明。未执行记not_run，不把静态检查通过当运行验证。
 
@@ -39,7 +44,7 @@ description: 审稿、核稿、润色技术文章及公众号排版，将 Markdo
 
 首次使用，先检查Python版本及Markdown、BeautifulSoup、cssutils、Pygments能否导入；仅在缺少环境或依赖时创建虚拟环境并安装 `requirements.txt`（Python 3.10+）。跨平台命令见 [环境准备](references/environment.md)。以下路径均相对本 SKILL.md，实际调用时解析为安装目录的绝对路径；使用同一个虚拟环境执行子脚本。
 
-完整处理在AI核稿修订后运行：
+仅文章处理在AI核稿修订后运行；默认联合交付在此命令追加`--slides-plan /绝对路径/slides-plan.json`：
 
 ```bash
 .venv/bin/python scripts/run.py --input /绝对路径/revised.md --output /绝对路径/article.html --theme ai-tech
@@ -67,7 +72,7 @@ description: 审稿、核稿、润色技术文章及公众号排版，将 Markdo
 
 ## 网页演示
 
-明确要求文章转PPT或网页演示时，读取 [演示流程](references/presentation.md)。基于修订稿规划大纲、选择magazine/swiss风格，按固定上游模板生成页面和讲稿，运行校验并检查浏览器效果。普通核稿排版不触发演示依赖下载。准备模板不等于完成PPT；输出为HTML而非.pptx，不改变已有四种文章模式。
+默认联合交付或明确要求文章转PPT时，读取 [演示流程](references/presentation.md)。基于修订稿规划大纲、选择magazine/swiss风格，按固定上游模板生成页面和讲稿，运行校验并检查浏览器效果。只核稿、核稿修订、仅文章或仅排版不触发演示依赖下载。默认联合交付和仅演示模式须写入实际页面与逐页讲稿，准备模板不等于完成PPT；输出为HTML而非.pptx。
 
 ## 交付与边界
 

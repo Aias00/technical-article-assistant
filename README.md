@@ -1,6 +1,6 @@
 # 技术文稿核稿与排版助手
 
-一个可安装技能，完成技术文稿核稿、修订、预检、公众号排版与可选网页PPT。只保留根 `SKILL.md`，不依赖另外安装审稿、预检或排版技能。
+一个可安装技能，默认从主题、资料或初稿直接交付技术文章与配套网页PPT：Markdown、公众号HTML、演示页面和逐页讲稿。只保留根 `SKILL.md`，不依赖另外安装审稿、预检或排版技能。
 
 ## 使用方式
 
@@ -8,7 +8,8 @@
 
 - “只核稿，别改原文”：输出问题清单。
 - “核稿并修订”：输出问题清单与修订稿。
-- “核稿并用科技色排版”：输出问题清单、修订稿及HTML。
+- “完整处理这篇稿子”：默认输出问题清单、修订稿、公众号HTML和网页PPT。
+- “只要文章，不需要PPT”：输出问题清单、修订稿及HTML。
 - “只排版，别改文字”：跳过AI修订与文风检查，生成HTML。
 - “把修订稿做成瑞士风分享PPT”：生成演示大纲、网页幻灯片和讲稿。
 
@@ -22,7 +23,17 @@
 - 平台交接：公众号HTML或修订Markdown交给独立腾讯发布器，不内置登录和提交。
 - 修复代码保真：代码围栏和缩进代码里的`# `注释不会再作为标题删除。
 
-## 本地运行
+## 默认成品
+
+宿主AI完成核稿修订和演示计划后，统一命令实际装配文章与幻灯片：
+
+```bash
+.venv/bin/python scripts/run.py --input /abs/revised.md --output /abs/delivery/article.html --slides-plan /abs/slides-plan.json
+```
+
+计划由宿主根据文章编写，不要求用户手工填写。详见 [联合交付](references/joint-delivery.md)。只准备模板不能算交付完成；网页PPT为HTML而非.pptx。
+
+## 本地运行（单独排版与检查）
 
 ```bash
 python3 -m venv .venv
@@ -62,14 +73,15 @@ requirements.txt         Python依赖
 
 Windows PowerShell使用 `.venv\Scripts\python.exe` 替换上述解释器路径，详见 [环境准备](references/environment.md)。
 
-## 网页PPT（可选）
+## 网页PPT运行时
 
 整合 [Guizang PPT Skill](https://github.com/op7418/guizang-ppt-skill) 的杂志风与瑞士风模板、演讲者模式和校验器。输出是HTML，不是.pptx。
 
 ```bash
 .venv/bin/python scripts/presentation.py setup
 .venv/bin/python scripts/presentation.py prepare --input /abs/revised.md --output-dir /abs/slides --style swiss
-# 宿主AI按references/presentation.md填写大纲、页面和讲稿后：
+# 宿主AI按联合交付规范生成页面计划后：
+.venv/bin/python scripts/presentation.py render --directory /abs/slides --plan /abs/slides-plan.json
 .venv/bin/python scripts/presentation.py validate --directory /abs/slides
 ```
 
