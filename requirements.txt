@@ -1,0 +1,1 @@
+-r wechat-article-formatter/requirements.txt
