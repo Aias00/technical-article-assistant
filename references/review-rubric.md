@@ -1,50 +1,33 @@
-# Technical Review Rubric
+# 技术文稿核稿依据
 
-Use this rubric to score a technical article before release.
+使用 Critical / Major / Minor 描述问题，不给未经校准的百分制分数。
 
-## Scoring Model (100 points)
+## 严重程度与发布结论
 
-1. Technical correctness (30)
-2. Evidence quality (20)
-3. Reproducibility (15)
-4. Structure and pedagogy (15)
-5. Practical depth (10)
-6. Language clarity (5)
-7. Platform compliance readiness (5)
+- Critical：已确认的关键事实错误、不安全指引、伪造数据或来源等阻断问题。
+- Major：重要主张缺证据、缺少必要前提、结构妨碍理解或与文种目标不符。
+- Minor：措辞、重复、可读性和排版问题。
 
-## Severity Rules
+review.md 按 references/review-template.md 输出发布结论：
 
-- `Critical`: factual error, unsafe guidance, fabricated data/source, or publish-blocking issue.
-- `Major`: weak evidence, missing validation, broken structure, low reproducibility.
-- `Minor`: wording, concision, tone, formatting polish.
+- Blocked：存在未解决的 Critical，或关键事实尚未核实、继续发布可能误导读者。
+- Needs revision：无上述阻断项，但仍有 Major 或其他必要修改未完成。
+- Ready：本次范围内未发现未解决的 Critical/Major；写明核验范围、剩余限制和排版是否实测。这不是正确性或平台审核保证。
 
-## Publish Threshold
+结论以交付时实际状态为准，修复前发现与修复后剩余问题分开记录。没有核验依据的主张标记“待核实”，不能自动断言其错误。
 
-- `Ready`: score >= 85 and no Critical.
-- `Needs revision`: score 70-84 or any Major cluster.
-- `Blocked`: score < 70 or any unresolved Critical.
+## 按文种检查
 
-## What Counts as Evidence
+- 操作教程：检查完成目标所需的版本、环境、命令/API、配置和验证方法。缺失会使步骤不可执行时列为 Major，不按项目数量机械计分。
+- 工程案例/性能实践：核对问题、约束、方案与验证；性能数据需说明环境、样本、指标和比较基线。
+- 架构分享：检查组件职责、数据流、关键取舍与适用边界；无需为了过审添加命令。
+- 技术宣传稿：检查能力描述、适用对象、可证实案例与承诺边界；不强制代码或复现步骤，不捏造客户数据。
 
-Preferred order:
+文种不明确时结合内容判断并注明假设；可有混合文种，按相关部分检查。
 
-1. Official docs/specs/standards
-2. Source code and commit history
-3. Reproducible benchmark or experiment log
-4. Reputable technical media or secondary analysis
+## 事实与证据
 
-If no source can be verified, mark the statement:
-
-```text
-Needs evidence: <claim>
-```
-
-## Reproducibility Checks
-
-A practical technical article should include at least 2 items:
-
-- exact commands or API calls
-- config snippets or parameters
-- error handling / edge cases
-- validation method (test, metric, comparison)
-- version/environment constraints
+有检索或源码读取能力时，对可核验的版本号、API行为及关键技术主张主动核对官方文档、版本说明或对应版本源码。记录来源URL或文件路径/版本及支持的具体主张；不可只写“已查官网”。
+优先顺序：官方文档/标准 → 对应版本源码与提交 → 可复现日志/实验 → 可靠二手来源。
+未提供访问权限、工具不可用、来源不可达或来源相互冲突时，说明验证范围并标待核实，不推测已验证。当前版本文档不能直接证明旧版本行为。
+查证只读取允许访问的资料，不向外部检索发送内部文稿、客户数据或敏感片段；公开关键词足以查证时只用公开关键词。

@@ -1,0 +1,58 @@
+{
+  "skill_name": "technical-article-assistant",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "只核稿，不要改原文。审阅fixtures/tutorial.md，用fixtures/official-api.md作为随附的官方API摘录。这些都是合成测试资料，不访问网络，输出review.md。",
+      "files": [
+        "fixtures/tutorial.md",
+        "fixtures/official-api.md"
+      ],
+      "assertions": [
+        "指出timeout单位错误并引用随附摘录",
+        "不编造80%吞吐提升的验证依据",
+        "给出Blocked结论及核验范围",
+        "不改写输入，不生成修订稿或HTML"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "只核稿fixtures/promotion.md。这是一篇技术宣传稿，只读提供的材料，不访问网络，输出review.md。",
+      "files": [
+        "fixtures/promotion.md"
+      ],
+      "assertions": [
+        "不因缺少命令、配置或代码而扣分或判为Major",
+        "使用发布结论和严重程度，不打百分制分数",
+        "说明核验范围，不编造外部验证",
+        "不改写原文"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "仅排版fixtures/format-only.md，不改字。输出HTML并说明交付步骤，不访问外部服务。",
+      "assertions": [
+        "使用format模式而非check-format",
+        "保留正文措辞与原稿文件",
+        "说明本地图片需要在公众号后台上传替换",
+        "不声称已经完成核稿或微信粘贴验证"
+      ],
+      "files": [
+        "fixtures/format-only.md"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "核稿并修订fixtures/version-claim.md。允许使用公开检索，核对Python 3.8的str.removeprefix支持情况。只检索公开版本和API名，不发送稿件全文。",
+      "assertions": [
+        "有检索能力时主动查对应版本官方文档或源码",
+        "报告实际来源及适用版本",
+        "工具不可用时标待核实，不宣称验证成功",
+        "不向外部发送内部全文"
+      ],
+      "files": [
+        "fixtures/version-claim.md"
+      ]
+    }
+  ]
+}

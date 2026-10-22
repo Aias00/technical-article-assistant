@@ -32,7 +32,7 @@ When an article is rejected for "灌水/技术无关":
 
 1. Remove slogan paragraphs without technical payload.
 2. Replace broad claims with mechanism + example.
-3. Add one "how to reproduce" subsection.
+3. For tutorials, add missing reproduction steps; for architecture or promotional articles, add verifiable mechanisms, examples and boundaries without inventing commands.
 4. Add one "failure case / boundary condition" subsection.
 5. Re-check title to match technical depth and scope.
 
@@ -42,7 +42,7 @@ Use this short internal checklist before finalizing:
 
 ```text
 - Is every major claim technically explainable?
-- Can at least one key point be reproduced?
+- For tutorials/case studies, can the key workflow or result be checked? For architecture/promotion, are capabilities and boundaries supported?
 - Is there enough concrete detail to help practitioners act?
 - Does the article teach something non-trivial?
 ```

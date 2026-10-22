@@ -408,7 +408,9 @@ class WeChatHTMLConverter:
 </head>
 <body>
     <!-- ⚠️ 标题请在微信公众号编辑器中单独填写，HTML 中已自动移除 H1 标题 -->
+    <section style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; font-size: 16px; line-height: 1.8; color: {self._extract_var('--text-primary', '#333')}; background-color: {self._extract_var('--bg-white', '#fff')}">
     {body_content}
+    </section>
 </body>
 </html>'''
 

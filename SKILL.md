@@ -1,6 +1,6 @@
 ---
 name: technical-article-assistant
-description: 审阅、修订并排版中文技术文稿。适用于技术宣传稿、工程实践和技术分享文章，支持只核稿、核稿修订、完整处理及仅排版，交付问题清单、修订稿和微信公众号 HTML。
+description: 审稿、核稿、润色技术文章及公众号排版，将 Markdown 转微信公众号 HTML。用于技术宣传稿、工程实践和架构分享的 review、polish、Markdown-to-WeChat formatting，交付问题清单、修订稿或排版文件。
 ---
 
 # 技术文稿核稿与排版助手
@@ -20,17 +20,17 @@ description: 审阅、修订并排版中文技术文稿。适用于技术宣传�
 
 ## 核稿与修订
 
-核稿时读取 [评审依据](references/review-rubric.md)。按技术事实、证据、结构、表达的顺序检查；涉及平台退稿时再读 [平台要求](references/platform-compliance.md)，修订时读 [改写规则](references/rewrite-playbook.md)。
+核稿时读取 [评审依据](references/review-rubric.md)。按文种检查技术事实、证据、结构和表达，不强制宣传稿或架构分享包含命令；涉及平台退稿时再读 [平台要求](references/platform-compliance.md)，修订时读 [改写规则](references/rewrite-playbook.md)。
 
-- 核实版本、API、数据、前提与代码示例，区分事实、推断与待核实项。没有依据就标记待核实，不编造数字、来源和测试结果。
-- review.md 记录问题严重程度、段落位置、原文片段、原因、证据或待核实项、修改建议；没有发现时如实说明审阅范围。
+- 有检索或源码读取能力时主动核对版本号、API行为与关键主张，以对应版本官方文档或源码为准并记录来源；工具不可用或无法确认时标待核实。外部检索不发送内部资料。区分事实、推断与待核实项，不编造数字、来源和测试结果。
+- 按 [核稿报告模板](references/review-template.md) 输出review.md：包含文种、Ready/Needs revision/Blocked结论、核验限制及Critical/Major/Minor问题，记录位置、原文、原因、依据和建议；不打百分制分数。
 - 修订保持原意、责任主体、术语、代码和用户指定的保护内容。事实纠正注明依据，无法核实的结论保持不确定性。
 - revised.md 是后续排版的唯一来源。review.md 补充修改摘要及尚未解决的问题，不能因脚本通过就宣称技术内容准确。
 - 只核稿模式不生成修改稿，也不执行排版。核稿修订模式对 revised.md 执行 `scripts/check_banned_scaffolding.py --input <文件>`。
 
 ## 检查与排版
 
-首次使用，在技能根目录创建虚拟环境并安装 `requirements.txt`（Python 3.10+）。以下路径均相对本 SKILL.md，实际调用时解析为安装目录的绝对路径；使用同一个虚拟环境执行子脚本。
+首次使用，先检查Python版本及Markdown、BeautifulSoup、cssutils、Pygments能否导入；仅在缺少环境或依赖时创建虚拟环境并安装 `requirements.txt`（Python 3.10+）。跨平台命令见 [环境准备](references/environment.md)。以下路径均相对本 SKILL.md，实际调用时解析为安装目录的绝对路径；使用同一个虚拟环境执行子脚本。
 
 完整处理在AI核稿修订后运行：
 
@@ -48,13 +48,13 @@ description: 审阅、修订并排版中文技术文稿。适用于技术宣传�
 
 文风命中需结合上下文判断，不能为了通过而改变事实；无法消除时说明阻塞。完整处理发现未核实的关键事实时，可生成排版草稿，但应在交付说明中明确“待核实”，不能宣称可直接发布。
 
-科技色默认 `ai-tech`；其他主题和排版限制见 [排版说明](references/formatting.md)。有浏览器能力时检查图片、列表、代码块和主题；未做视觉检查应明确说明。
+以上为macOS/Linux命令；Windows使用 `.venv\Scripts\python.exe` 替换解释器路径。科技色默认 `ai-tech`；其他主题和排版限制见 [排版说明](references/formatting.md)。有浏览器能力时检查图片、列表、代码块和主题；未做视觉检查应明确说明。
 
 ## 交付与边界
 
-最终列出实际文件位置、修改摘要、检查结果与未解决事项，按模式交付，不能伪造缺失产物。
+最终列出实际文件位置、修改摘要、检查结果与未解决事项，按模式交付，不能伪造缺失产物。交付公众号HTML时提醒在浏览器复制渲染正文，在公众号后台重新上传并替换本地图片，最后在微信编辑器及手机预览核对标题、图片、代码和样式；未经验证不得宣称粘贴效果一致。
 本技能不发布文章、不上传图片、不执行公众号账号操作；不能保证识别全部技术错误、涉密内容或合规问题。
 
 本地脚本读取输入、主题及技能文件，写指定输出，调用包内Python子进程，无需Token或网络。依赖安装需要包源访问，宿主AI的数据处理遵循所在环境规定。使用脱敏数据，不打包凭据。
 
-安装包以本目录为一个整体，保留唯一根SKILL.md、scripts、references、assets及requirements.txt。元景的文件读写、Python、依赖安装及子进程能力仍需真实环境验证。
+安装包以本目录为一个整体，保留唯一根SKILL.md、scripts、references、assets及requirements.txt。目标宿主的文件读写、Python、依赖安装及子进程能力需按实际环境验证。

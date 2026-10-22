@@ -40,11 +40,13 @@ tests/                   回归测试及样稿
 requirements.txt         Python依赖
 ```
 
-## 验证与参赛边界
+## 验证范围
 
 本地流程不调用网络、不需要发布账号、不上传图片。不能保证技术事实正确、涉密识别或全面合规；HTML检查不等于完成视觉验收。依赖安装需要访问包源。
-元景安装、宿主AI核稿效果、真实提效数据与竞赛录屏尚待验证；不声明已满足市场上架条件。
+宿主兼容性及语义核稿质量需按目标环境验证。行为试运行与用例见 `evals/`；项目提取历史单独保存在 `docs/extraction-history.md`。
 
 ## 来源
 
-提取并整合自 https://github.com/Aias00/agent-skills ，保留Apache-2.0许可证。第三方依赖各自许可证仍适用；参赛独立开发归属需要另行核实。
+提取并整合自 https://github.com/Aias00/agent-skills ，保留Apache-2.0许可证。第三方依赖各自许可证仍适用。
+
+Windows PowerShell使用 `.venv\Scripts\python.exe` 替换上述解释器路径，详见 [环境准备](references/environment.md)。
