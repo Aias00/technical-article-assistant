@@ -1,9 +1,9 @@
 ---
 name: technical-article-assistant
-description: 从主题、资料或初稿生成技术文章与配套网页PPT，默认同时交付Markdown、公众号HTML、杂志风或瑞士风演示及讲稿。也支持独立审稿、核稿、润色和Markdown-to-WeChat formatting，留存来源与代码验证记录。
+description: 从主题、资料或初稿生成文章与配套网页PPT，支持技术文章、工作总结/项目复盘、企业宣传/产品介绍、行业观察/观点。默认交付Markdown、公众号HTML及演示讲稿，也支持只审稿、润色或排版（article review, writing, slides, Markdown-to-WeChat）。
 ---
 
-# 技术文稿核稿与排版助手
+# 文章与演示文稿助手
 
 一个技能默认完成文章与配套网页PPT的联合交付，核稿、修订、排版和演示共用一份修订稿。AI语义审阅由宿主执行，本地脚本提供文风检查和HTML生成，不需要调用其他技能。
 
@@ -18,7 +18,7 @@ description: 从主题、资料或初稿生成技术文章与配套网页PPT，�
 | 只排版、原文不要改 | 仅排版 | article.html，保留原文措辞 |
 | 文章转PPT、技术分享演示、杂志风/瑞士风slides | 网页演示 | slides/outline.md、index.html、讲稿及依赖 |
 
-输入是主题、资料URL、Markdown文件或用户提供的正文；主题/URL输入先搜集允许访问的资料成稿，不能凭空生成技术事实。可附目标读者、修改边界、证据、主题和封面。缺省按中文技术分享稿处理。原文保留，所有交付写入独立输出目录；已有同名文件先读取，避免覆盖其他任务产物。
+输入是主题、资料URL、Markdown文件或用户提供的正文；主题/URL输入先搜集允许访问的资料成稿，不能凭空生成事实、业绩、案例或引语。可附目标读者、修改边界、证据、主题和封面。先按 [文种选择](references/article-types.md) 判断类型，用户指定优先，混合稿按章节适用；不明确时采用通用规则并注明假设。原文保留，所有交付写入独立输出目录；已有同名文件先读取，避免覆盖其他任务产物。
 
 ## 默认联合交付
 
@@ -32,13 +32,13 @@ description: 从主题、资料或初稿生成技术文章与配套网页PPT，�
 
 ## 核稿与修订
 
-核稿时读取 [评审依据](references/review-rubric.md)。按文种检查技术事实、证据、结构和表达，不强制宣传稿或架构分享包含命令；涉及平台退稿时再读 [平台要求](references/platform-compliance.md)，修订时读 [改写规则](references/rewrite-playbook.md)。
+核稿时读取 [通用依据](references/review-rubric.md)及文种选择中对应的规则。按文种检查事实、证据、结构和表达，不要求非技术稿提供命令或代码；涉及平台退稿时再读 [平台要求](references/platform-compliance.md)，修订时读 [改写规则](references/rewrite-playbook.md)。
 
-- 有检索或源码读取能力时主动核对版本号、API行为与关键主张，以对应版本官方文档或源码为准并记录来源；工具不可用或无法确认时标待核实。外部检索不发送内部资料。区分事实、推断与待核实项，不编造数字、来源和测试结果。
+- 按文种核对关键主张：技术稿查版本/API，总结查实际成果与数据口径，宣传查承诺与案例，观点查论据与推理。公开事实有工具时主动查证，内部数据使用获准材料；无法确认标待核实，缺材料标待补充，不编造来源、数字或引语。
 - 按 [核稿报告模板](references/review-template.md) 输出review.md：包含文种、Ready/Needs revision/Blocked结论、核验限制及Critical/Major/Minor问题，记录位置、原文、原因、依据和建议；不打百分制分数。
 - 修订保持原意、责任主体、术语、代码和用户指定的保护内容。事实纠正注明依据，无法核实的结论保持不确定性。
 - revised.md 是后续排版的唯一来源。review.md 补充修改摘要及尚未解决的问题，不能因脚本通过就宣称技术内容准确。
-- 只核稿模式不生成修改稿，也不执行排版。核稿修订模式对 revised.md 执行 `scripts/check_banned_scaffolding.py --input <文件>`。
+- 只核稿模式不生成修改稿，也不执行排版。核稿修订模式对 revised.md 执行 `scripts/check_banned_scaffolding.py --input <文件> --policy advisory`。
 
 ## 检查与排版
 
@@ -58,7 +58,7 @@ description: 从主题、资料或初稿生成技术文章与配套网页PPT，�
 
 `format`跳过文风检查，仍检查HTML结构；不修改Markdown，HTML按公众号正文规则移除元数据和一级标题。默认模式`check-format`依次执行Markdown本地检查、文风检查、排版、HTML检查；Markdown检查发现缺图或未闭合顶层代码围栏时失败，不下载远端图片，也不运行代码；可选 `--cover /绝对路径/cover.png`。任何步骤失败都不得交付为通过，已生成文件只能视为中间产物。
 
-文风命中需结合上下文判断，不能为了通过而改变事实；无法消除时说明阻塞。完整处理发现未核实的关键事实时，可生成排版草稿，但应在交付说明中明确“待核实”，不能宣称可直接发布。
+文风默认只提示，不因关键词命中阻断交付。脚本支持`--style-check advisory|strict|off`；用户明确严格要求时才用strict。引用、代码和刻意修辞不为过检查而改动，技术事实、缺图及结构校验失败仍需处理。完整处理发现未核实的关键事实时，可生成排版草稿，但应在交付说明中明确“待核实”，不能宣称可直接发布。
 
 以上为macOS/Linux命令；Windows使用 `.venv\Scripts\python.exe` 替换解释器路径。科技色默认 `ai-tech`；其他主题和排版限制见 [排版说明](references/formatting.md)。有浏览器能力时检查图片、列表、代码块和主题；未做视觉检查应明确说明。
 

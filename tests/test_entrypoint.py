@@ -20,7 +20,7 @@ class EntrypointTests(unittest.TestCase):
             source = Path(tmp) / 'article.md'
             output = Path(tmp) / 'article.html'
             source.write_text('也就是说，这是一段测试。')
-            result = self.run_script('scripts/run.py', '--input', source, '--output', output)
+            result = self.run_script('scripts/run.py', '--input', source, '--output', output, '--style-check', 'strict')
             self.assertNotEqual(result.returncode, 0)
             self.assertFalse(output.exists())
 

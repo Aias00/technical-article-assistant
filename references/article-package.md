@@ -43,7 +43,7 @@
 ```json
 {
   "title": "稿件标题",
-  "article_type": "tutorial|case-study|architecture|promotion",
+  "article_type": "technical|work-summary|promotion|opinion",
   "canonical_markdown": "revised.md",
   "review": {"verdict": "Needs revision", "report": "review.md"},
   "sources": "sources.md",
@@ -54,5 +54,7 @@
   "publication": {"status": "not_requested"}
 }
 ```
+
+article_type从四个标识中选择一个，混合稿可另加章节类型说明。没有代码/配置时verification.md记录not_applicable及实际核验范围，不生成伪造运行日志。
 
 按实际文种和文件替换示意值，不生成不存在文件的引用。JSON使用UTF-8且能被标准解析器读取；本地报告中的输入摘要可用于判断后续修改是否让检查失效。修改Markdown后重新检查和排版。

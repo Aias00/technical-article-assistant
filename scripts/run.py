@@ -16,6 +16,7 @@ def main():
     parser.add_argument('--mode', choices=['check-format', 'format'], default='check-format')
     parser.add_argument('--input', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--style-check', choices=['advisory', 'strict', 'off'], default='advisory')
     parser.add_argument('--theme', default='ai-tech')
     parser.add_argument('--cover', type=Path, help='Optional cover to check')
     parser.add_argument('--slides-plan', type=Path, help='Host-authored JSON plan: produce article HTML and a populated slide deck together')
@@ -39,7 +40,8 @@ def main():
         ('scripts/check_html.py', ['--html', str(output)]),
     ]
     if args.mode == 'check-format':
-        steps.insert(0, ('scripts/check_banned_scaffolding.py', ['--input', str(source)]))
+        if args.style_check != 'off':
+            steps.insert(0, ('scripts/check_banned_scaffolding.py', ['--input', str(source), '--policy', args.style_check]))
         steps.insert(0, ('scripts/inspect_article.py', ['--input', str(source)]))
     if args.cover:
         steps.append(('scripts/check_cover.py', ['--cover', str(args.cover.resolve())]))

@@ -1,5 +1,7 @@
 # Platform Compliance Notes (CN Tech Content)
 
+Apply these checks to technical-content platform submissions. General/non-technical articles follow article-types.md and their actual platform requirements, without a mandatory technical mechanism or executable artifact.
+
 Use this file for submission-risk reduction.  
 These are practical editing checks, not legal advice or platform policy guarantees.
 

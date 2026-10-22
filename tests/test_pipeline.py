@@ -16,7 +16,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_checker_rejects_known_issues(self):
-        result = self.run_script('scripts/check_banned_scaffolding.py', '--input', ROOT / 'tests/fixtures/sample_with_issues.md')
+        result = self.run_script('scripts/check_banned_scaffolding.py', '--input', ROOT / 'tests/fixtures/sample_with_issues.md', '--policy', 'strict')
         self.assertNotEqual(result.returncode, 0)
 
     def test_formatter_preserves_body_and_removes_metadata(self):

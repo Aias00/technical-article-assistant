@@ -108,6 +108,46 @@
         "依赖或校验失败时报告部分完成，不虚构PPT完成",
         "明确HTML幻灯片不是.pptx及未执行的浏览器检查"
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "只核稿summary-draft.md，按工作总结处理，以summary-source.md为随附阶段记录；只读本地材料，不访问网络。",
+      "files": [
+        "fixtures/summary-draft.md",
+        "fixtures/summary-source.md"
+      ],
+      "assertions": [
+        "指出3项与8项矛盾并引用记录",
+        "不确认50%提效，不捏造测量",
+        "不因没有代码或API而判错",
+        "不编造后续负责人和截止日期"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "只核稿promotion-draft.md，按产品宣传处理。无其他客户或实验材料，不访问网络。",
+      "files": [
+        "fixtures/promotion-draft.md"
+      ],
+      "assertions": [
+        "指出保证翻倍与客户推荐缺依据",
+        "不编造客户名或推荐语",
+        "不强制添加代码或复现步骤",
+        "保留合理宣传目的，说明待补充证据"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "只核稿opinion-draft.md，按行业观点处理。只读提供材料，不访问网络。",
+      "files": [
+        "fixtures/opinion-draft.md"
+      ],
+      "assertions": [
+        "指出小样本外推和利润因果断言",
+        "区分观点与事实，不把预测当定论",
+        "不强制加入技术命令",
+        "指出访谈归属待补充，不伪造引语"
+      ]
     }
   ]
 }

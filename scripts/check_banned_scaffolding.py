@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail if banned Chinese scaffolding patterns remain in prose."""
+"""Suggest prose edits; strict mode can enforce the selected style rules."""
 
 from __future__ import annotations
 
@@ -29,19 +29,29 @@ class Hit:
 
 
 def iter_prose_lines(text: str) -> list[tuple[int, str]]:
-    lines: list[tuple[int, str]] = []
-    in_fence = False
-    for idx, raw in enumerate(text.splitlines(), start=1):
-        stripped = raw.lstrip()
-        if stripped.startswith("```"):
-            in_fence = not in_fence
+    result: list[tuple[int, str]] = []
+    raw_lines = text.splitlines()
+    metadata_end = -1
+    if raw_lines and raw_lines[0].lstrip('\ufeff').strip() == '---':
+        metadata_end = next((i for i, line in enumerate(raw_lines[1:], 1) if line.strip() in ('---', '...')), -1)
+    fence = None
+    for index, raw in enumerate(raw_lines):
+        if index <= metadata_end:
             continue
-        if in_fence:
+        marker = re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', raw)
+        if marker:
+            token, tail = marker.groups()
+            if fence is None:
+                fence = (token[0], len(token))
+            elif token[0] == fence[0] and len(token) >= fence[1] and not tail.strip():
+                fence = None
             continue
-        if stripped.startswith(">"):
+        if fence or raw.startswith(('    ', '\t')) or raw.lstrip().startswith('>'):
             continue
-        lines.append((idx, raw))
-    return lines
+        prose = re.sub(r'(`+)(?!`).*?\1(?!`)', '', raw)
+        prose = re.sub(r'“[^”]*”|「[^」]*」|『[^』]*』|"[^"\n]*"', '', prose)
+        result.append((index + 1, prose))
+    return result
 
 
 def find_hits(text: str) -> list[Hit]:
@@ -66,10 +76,14 @@ def read_text(path: str | None) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Check rewritten Chinese prose for banned scaffolding patterns."
+        description="Suggest edits for selected Chinese prose patterns; no authorship or factual judgment."
     )
     parser.add_argument("--input", help="Path to the text or markdown file to check")
+    parser.add_argument("--policy", choices=["advisory", "strict", "off"], default="advisory")
     args = parser.parse_args()
+    if args.policy == "off":
+        print("SKIPPED: prose style checking disabled")
+        return 0
 
     text = read_text(args.input)
     hits = find_hits(text)
@@ -78,13 +92,13 @@ def main() -> int:
         print("OK: no banned scaffolding patterns found in prose")
         return 0
 
-    print("Blocked: banned scaffolding patterns found", file=sys.stderr)
+    print("Blocked: selected style rules matched" if args.policy == "strict" else "Style suggestions: review matches in context; wording is unchanged", file=sys.stderr)
     for hit in hits:
         print(
             f"line {hit.line_no}: {hit.label} -> {hit.excerpt}",
             file=sys.stderr,
         )
-    return 1
+    return 1 if args.policy == "strict" else 0
 
 
 if __name__ == "__main__":

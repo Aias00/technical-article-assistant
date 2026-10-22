@@ -1,5 +1,5 @@
 # Python dependencies for technical-article-assistant
-# 技术文稿核稿与排版助手的Python依赖
+# 文章与演示文稿助手的Python依赖
 
 # Markdown解析
 markdown>=3.4.0

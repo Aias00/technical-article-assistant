@@ -1,81 +1,20 @@
-# Rewrite Playbook
+# 修订规则
 
-Use these patterns for "review + rewrite" tasks.
+保持原意、事实、数字口径、限定词、责任主体和引用；修订稿另存，不覆盖用户原稿。结构按文种选择，见article-types.md及types/，不把所有文章改成教程。
 
-## Recommended Article Skeleton
+## 通用修订顺序
 
-```markdown
-# <Title aligned with scope>
+1. 修正有依据的事实错误；缺少证据的主张标待核实/待补充。
+2. 补足论证中已知的条件与范围，不补造业务数据或故事细节。
+3. 修复标题与正文不一致、段落重复和逻辑跳跃。
+4. 按受众调整术语和句长，保留作者立场与有意采用的表达。
+5. 检查修订稿与PPT里的数字、时间、引用、责任主体和不确定性一致。
 
-## Problem
-What practical problem is being solved?
+## 文风策略
 
-## Constraints and Tradeoffs
-What assumptions, limits, and competing options exist?
+尊重用户指定的正式、自然、宣传或评论语气，不能把所有内容修成同一种公众号口吻。
+文风检查默认advisory，仅提示需要上下文复核的表达，不证明AI生成或事实错误。合理对比、直接引语、代码和刻意修辞保持原样；不用换同义词的方式规避证据问题。
+用户明确要求严格去套话时使用strict；用户不需文风提示时off。strict失败只代表命中所选文风规则，不能直接改判发布结论为事实错误。
 
-## Approach
-Architecture, algorithm, or design choices.
-
-## Implementation
-Key commands, code snippets, configs, and integration steps.
-
-## Validation
-How results were verified (tests, metrics, comparisons).
-
-## Failure Cases and Boundaries
-Where this approach can fail and what to do.
-
-## Conclusion
-When to use this approach and next actions.
-```
-
-## Rewrite Tactics
-
-1. Convert slogan sentences into mechanism statements.
-2. Convert abstract claims into example + condition.
-3. Add "because/therefore" links to close reasoning gaps.
-4. Replace generic advice with operator-level actions.
-5. Keep paragraphs compact but information-dense.
-
-## Chinese Tone Preferences
-
-Use these defaults when the user is asking for Chinese article polish, especially for WeChat/public-account style posts:
-
-1. Prefer natural spoken-written Chinese over report-summary tone.
-2. Prefer `能看出` / `主要看` / `这次观察范围` over `更适合` / `不太适合` / `用于回答`.
-3. Prefer direct lead-ins such as `先看一个最直观的变化` over analytical lines like `最先跳出来的是`.
-4. Prefer `更容易看明白` / `更容易看懂` over `不容易看偏`.
-5. Replace section openers like `这一项要单独看` with more natural explanation, for example `这部分得单独说`.
-6. If the article is based on a research paper or report, absorb the evidence into the prose; do not let the article sound like a translated abstract.
-7. Keep the register relaxed but not sloppy: one point per paragraph, short transitions, fewer meta-comments about the article itself.
-
-## Quick Replacements
-
-```text
-Avoid: 这篇研究更适合回答……
-Prefer: 这篇研究主要反映…… / 这次能看出的，是……
-
-Avoid: 最先跳出来的是输入字符数。
-Prefer: 先看一个最直观的变化：输入字符数。
-
-Avoid: 这三点先记住，后面的数据就不容易看偏。
-Prefer: 这三点先记住，后面的数据就更容易看明白。
-
-Avoid: 这一项要单独看。
-Prefer: 这部分得单独说。 / 这块要单独看。
-```
-
-## Before/After Pattern
-
-```text
-Before: "This architecture is more advanced and improves efficiency."
-After:  "This architecture removes cross-service polling by using event-driven dispatch, reducing average latency from 420ms to 170ms in our staging test."
-```
-
-## Submission Rescue Paragraph Template
-
-```markdown
-## Why This Works in Practice
-核心机制是 <mechanism>。在 <environment> 下，我们通过 <operation> 验证了它的效果。  
-局限是 <limitation>，当出现 <failure condition> 时，建议切换到 <fallback>.
-```
+例如原文只写“调整流程后，团队认为处理更顺畅”，可澄清这是反馈；没有测量记录时不能改写为“效率提升50%”。
+技术稿里需要重写示例代码时先说明问题、核对版本及验证，不能仅为语言顺畅改动代码。直接引语不改写为新的引语。
