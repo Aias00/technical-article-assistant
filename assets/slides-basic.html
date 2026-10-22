@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文章演示</title>
+<style>
+:root{color-scheme:dark;--ink:#172329;--paper:#f2f0e9;--accent:#b5f2c3}
+*{box-sizing:border-box}body{margin:0;background:#10181c;color:var(--paper);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--scale,1));transform-origin:center}
+.slide{position:absolute;inset:0;padding:84px 112px;display:flex;flex-direction:column;visibility:hidden;opacity:0;pointer-events:none;background:var(--paper);color:var(--ink)}
+.slide.active{visibility:visible;opacity:1;pointer-events:auto}.eyebrow{font:22px ui-monospace,monospace;letter-spacing:.18em;padding-bottom:25px;border-bottom:2px solid currentColor;opacity:.65}
+h1{font-size:76px;font-weight:600;line-height:1.18;max-width:1620px;margin:50px 0 36px;letter-spacing:-.035em;overflow-wrap:anywhere}
+ul{list-style:none;padding:0;margin:0;display:grid;gap:18px}li{font-size:36px;line-height:1.5;padding-left:38px;position:relative;overflow-wrap:anywhere}li:before{content:"";position:absolute;left:0;top:21px;width:12px;height:12px;background:currentColor}
+.slide.cover,.slide.closing{background:var(--ink);color:var(--paper)}.cover h1,.closing h1{color:var(--accent)}.page-number{margin-top:auto;padding-top:20px;font:22px ui-monospace,monospace;opacity:.6}
+#controls{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:7px 12px;background:#172329eb;border:1px solid #ffffff25;border-radius:8px;z-index:3;font-size:12px}
+button{font:inherit;color:inherit;background:transparent;border:1px solid #ffffff45;padding:6px 10px;border-radius:4px;cursor:pointer}button:hover,button:focus-visible{background:#ffffff20}#notes{display:none;position:fixed;right:16px;top:16px;width:min(440px,90vw);max-height:70vh;overflow:auto;padding:20px;background:#10181cf5;border:1px solid #ffffff45;border-radius:8px;z-index:5;font-size:16px;line-height:1.7}#notes.open{display:block}#notes h2{margin-top:0;font-size:20px}#notes ol{padding-left:24px}#notes li{font-size:16px;line-height:1.7;padding:0}#notes li:before{display:none}
+#overview{display:none;position:fixed;inset:0;padding:30px;background:#10181cf5;z-index:4;overflow:auto;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;align-content:start}#overview.open{display:grid}#overview button{text-align:left;min-height:100px;padding:20px;font-size:18px}
+@media print{body{overflow:visible;background:#fff}#stage{position:static;width:auto;height:auto;transform:none}.slide{position:relative;visibility:visible;opacity:1;break-after:page;width:1920px;height:1080px}#controls,#notes,#overview{display:none!important}@page{size:landscape;margin:0}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="stage" aria-label="演示文稿"><!-- SLIDES_HERE --></main>
+<nav id="controls" aria-label="演示控制"><button id="previous" aria-label="上一页">←</button><span id="page"></span><button id="next" aria-label="下一页">→</button><button id="notes-toggle">P 讲稿</button><button id="overview-toggle">Esc 总览</button></nav>
+<aside id="notes" aria-label="当前页讲稿"></aside><div id="overview" aria-label="页面总览"></div>
+<script>
+const SPEAKER_NOTES = /* NOTES_HERE */ [];
+const slides=[...document.querySelectorAll('section.slide')];let current=0;
+const overview=document.getElementById('overview'),notes=document.getElementById('notes');
+function fit(){document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1920,innerHeight/1080));}
+function show(index){current=Math.max(0,Math.min(slides.length-1,index));slides.forEach((slide,i)=>{slide.classList.toggle('active',i===current);slide.setAttribute('aria-hidden',i!==current);slide.querySelector('.page-number').textContent=String(i+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');});document.getElementById('page').textContent=(current+1)+' / '+slides.length;notes.replaceChildren();const note=SPEAKER_NOTES[current];if(note){const title=document.createElement('h2');title.textContent=note.title;const list=document.createElement('ol');note.talk.forEach(text=>{const item=document.createElement('li');item.textContent=text;list.append(item);});notes.append(title,list);}}
+function toggleOverview(){overview.classList.toggle('open');}
+slides.forEach((slide,i)=>{const button=document.createElement('button');button.textContent=(i+1)+'. '+SPEAKER_NOTES[i].title;button.onclick=()=>{show(i);overview.classList.remove('open');};overview.append(button);});
+document.getElementById('previous').onclick=()=>show(current-1);document.getElementById('next').onclick=()=>show(current+1);document.getElementById('notes-toggle').onclick=()=>notes.classList.toggle('open');document.getElementById('overview-toggle').onclick=toggleOverview;
+addEventListener('keydown',event=>{if(['ArrowRight','PageDown',' '].includes(event.key)){event.preventDefault();show(current+1);}if(['ArrowLeft','PageUp'].includes(event.key)){event.preventDefault();show(current-1);}if(event.key==='Home')show(0);if(event.key==='End')show(slides.length-1);if(event.key==='Escape')toggleOverview();if(event.key.toLowerCase()==='p')notes.classList.toggle('open');});
+let touchX=null;addEventListener('touchstart',event=>{touchX=event.changedTouches[0].clientX;},{passive:true});addEventListener('touchend',event=>{if(touchX!==null){const difference=event.changedTouches[0].clientX-touchX;if(Math.abs(difference)>45)show(current+(difference<0?1:-1));touchX=null;}},{passive:true});
+addEventListener('resize',fit);fit();show(0);
+</script>
+</body>
+</html>

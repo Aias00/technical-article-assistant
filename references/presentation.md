@@ -1,4 +1,6 @@
-# 文章转网页演示文稿
+# 高级文章转网页演示文稿
+
+默认quick使用自有basic模板，见quick-delivery.md；本文件仅在明确需要高级风格时加载。
 
 本模式整合[歸藏 Guizang PPT Skill](https://github.com/op7418/guizang-ppt-skill)，提供两种风格：magazine（杂志风）和swiss（瑞士国际主义）。输出是浏览器打开的HTML演示，不是.pptx；不加入视频渲染流程。
 

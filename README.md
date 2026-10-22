@@ -37,9 +37,32 @@
 - 平台交接：公众号HTML或修订Markdown交给独立腾讯发布器，不内置登录和提交。
 - 修复代码保真：代码围栏和缩进代码里的`# `注释不会再作为标题删除。
 
+## 快速档（默认）
+
+- 模型只写文章、PPT要点和讲稿，不生成逐页HTML。
+- 内置basic轻模板，无CDN，不需要Git、Node或Guizang下载。
+- 核心Python依赖从6项减为4项，首次自动准备，之后复用。
+- `--reuse`增量更新未变页面，手工编辑过的演示不会被覆盖。
+- `timings.json`记录本地装配各阶段；不把它当成模型端到端耗时。
+
+```bash
+python3 scripts/bootstrap.py
+python3 scripts/bootstrap.py -- run.py --input /abs/revised.md --output /abs/delivery/article.html --slides-plan /abs/basic-plan.json
+```
+
+安装包内提供可直接试跑的示例：
+
+```bash
+python3 scripts/bootstrap.py -- run.py --input examples/work-summary.md --output output/demo/article.html --slides-plan examples/basic-plan.json
+```
+
+Windows使用`py -3`替换`python3`。计划由宿主按 [快速交付](references/quick-delivery.md) 编写，用户无需手工填JSON。首次仍需Python及核心包安装，不能承诺所有环境三分钟完成。
+
+standard/research与Guizang高级风格保留，详见 [高级联合交付](references/joint-delivery.md)。
+
 ## 默认成品
 
-宿主AI完成核稿修订和演示计划后，统一命令实际装配文章与幻灯片：
+宿主AI完成核稿修订和演示计划后，统一命令实际装配文章与幻灯片（basic计划走轻模板，magazine/swiss计划走高级路径）：
 
 ```bash
 .venv/bin/python scripts/run.py --input /abs/revised.md --output /abs/delivery/article.html --slides-plan /abs/slides-plan.json

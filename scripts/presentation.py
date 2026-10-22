@@ -101,6 +101,9 @@ class SlideCounter(HTMLParser):
 
 def load_plan(path, expected_sha=None):
     plan = json.loads(path.read_text(encoding='utf-8'))
+    if isinstance(plan, dict) and plan.get('style') == 'basic':
+        from basic_presentation import validate_plan
+        return validate_plan(plan, expected_sha)
     if not isinstance(plan, dict) or plan.get('style') not in ('magazine', 'swiss'):
         raise ValueError('Plan style must be magazine or swiss.')
     if expected_sha is not None and plan.get('source_sha256') != expected_sha:

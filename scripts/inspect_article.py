@@ -47,7 +47,7 @@ def inspect(source):
             code = block
         language = next((item[9:] for item in code.get('class', []) if item.startswith('language-')), None)
         snippets.append({'id': f'code-{index}', 'language': language, 'sha256': hashlib.sha256(code.get_text().encode()).hexdigest(), 'execution_status': 'not_run'})
-    return {'input': str(source), 'sha256': hashlib.sha256(text.encode()).hexdigest(), 'status': 'failed' if errors else 'passed', 'scope': 'Local image existence and top-level fence closure only; no fact, visual or runtime verification.', 'images': images, 'snippets': snippets, 'errors': errors}
+    return {'input': str(source), 'sha256': hashlib.sha256(source.read_bytes()).hexdigest(), 'status': 'failed' if errors else 'passed', 'scope': 'Local image existence and top-level fence closure only; no fact, visual or runtime verification.', 'images': images, 'snippets': snippets, 'errors': errors}
 
 
 def main():
