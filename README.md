@@ -1,6 +1,6 @@
 # 技术文稿核稿与排版助手
 
-一个可安装技能，完成技术文稿核稿、修订、预检和公众号排版。只保留根 `SKILL.md`，不依赖另外安装审稿、预检或排版技能。
+一个可安装技能，完成技术文稿核稿、修订、预检、公众号排版与可选网页PPT。只保留根 `SKILL.md`，不依赖另外安装审稿、预检或排版技能。
 
 ## 使用方式
 
@@ -10,6 +10,7 @@
 - “核稿并修订”：输出问题清单与修订稿。
 - “核稿并用科技色排版”：输出问题清单、修订稿及HTML。
 - “只排版，别改文字”：跳过AI修订与文风检查，生成HTML。
+- “把修订稿做成瑞士风分享PPT”：生成演示大纲、网页幻灯片和讲稿。
 
 核稿与修订由宿主AI按SKILL.md执行，Python入口只执行本地检查和排版。
 
@@ -52,7 +53,7 @@ requirements.txt         Python依赖
 
 ## 验证范围
 
-本地流程不调用网络、不需要发布账号、不上传图片。不能保证技术事实正确、涉密识别或全面合规；HTML检查不等于完成视觉验收。依赖安装需要访问包源。
+普通文章本地流程不调用网络、不需要发布账号、不上传图片；可选演示能力的网络范围见下方说明。不能保证技术事实正确、涉密识别或全面合规；HTML检查不等于完成视觉验收。依赖安装需要访问包源。
 宿主兼容性及语义核稿质量需按目标环境验证。行为试运行与用例见 `evals/`；项目提取历史单独保存在 `docs/extraction-history.md`。
 
 ## 来源
@@ -60,3 +61,17 @@ requirements.txt         Python依赖
 提取并整合自 https://github.com/Aias00/agent-skills ，保留Apache-2.0许可证。第三方依赖各自许可证仍适用。
 
 Windows PowerShell使用 `.venv\Scripts\python.exe` 替换上述解释器路径，详见 [环境准备](references/environment.md)。
+
+## 网页PPT（可选）
+
+整合 [Guizang PPT Skill](https://github.com/op7418/guizang-ppt-skill) 的杂志风与瑞士风模板、演讲者模式和校验器。输出是HTML，不是.pptx。
+
+```bash
+.venv/bin/python scripts/presentation.py setup
+.venv/bin/python scripts/presentation.py prepare --input /abs/revised.md --output-dir /abs/slides --style swiss
+# 宿主AI按references/presentation.md填写大纲、页面和讲稿后：
+.venv/bin/python scripts/presentation.py validate --directory /abs/slides
+```
+
+prepare仅准备模板，不代表完成演示；校验需要Node.js。依赖安装需要Git和网络，演示可能访问字体/图标CDN。
+上游使用AGPL-3.0，通过固定版本独立下载；模板不以本项目Apache许可证重新分发。生成目录保留上游LICENSE、来源及对应源码，分发时一并携带。详见 [演示流程](references/presentation.md)。

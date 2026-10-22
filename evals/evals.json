@@ -80,6 +80,20 @@
         "不伪造文章URL或成功状态",
         "只引用真实存在的产物"
       ]
+    },
+    {
+      "id": 7,
+      "prompt": "将fixtures/promotion.md做成瑞士风网页演示，基于原稿，不生成公众号HTML，不发布。上游依赖不可用时明确说明，不伪造完成产物。",
+      "files": [
+        "fixtures/promotion.md"
+      ],
+      "assertions": [
+        "选择网页演示模式并加载presentation.md",
+        "有实际页面与一一对应讲稿后才能声称演示完成",
+        "不把prepare空模板当PPT完成",
+        "保留AGPL来源与对应源码，不改标Apache",
+        "区分静态校验、渲染测量与人工浏览器验证"
+      ]
     }
   ]
 }
