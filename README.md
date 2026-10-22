@@ -1,39 +1,50 @@
 # 技术文稿核稿与排版助手
 
-从 agent-skills 提取的独立技能项目，包含技术文章审阅、发布前检查与微信公众号 HTML 排版。
+一个可安装技能，完成技术文稿核稿、修订、预检和公众号排版。只保留根 `SKILL.md`，不依赖另外安装审稿、预检或排版技能。
 
-## 模块
+## 使用方式
 
-- technical-article-review：由宿主 AI 执行技术文稿审阅与修改。
-- technical-article-preflight：本地文案、HTML、封面检查；原发布干跑依赖未打包的 wechat-publisher。
-- wechat-article-formatter：Markdown 转内联样式 HTML。
+安装整个目录后，让宿主AI使用本技能处理Markdown或粘贴正文：
 
-## 当前边界
+- “只核稿，别改原文”：输出问题清单。
+- “核稿并修订”：输出问题清单与修订稿。
+- “核稿并用科技色排版”：输出问题清单、修订稿及HTML。
+- “只排版，别改文字”：跳过AI修订与文风检查，生成HTML。
 
-推荐使用下方统一入口，历史发布预检接口仅供溯源。
+核稿与修订由宿主AI按SKILL.md执行，Python入口只执行本地检查和排版。
 
-尚未验证元景数字员工兼容性；本地脚本检查不能证明技术事实准确、涉密合规或内容质量。外部发布服务不在提取范围内。
-
-## 来源
-
-提取自 https://github.com/Aias00/agent-skills ，保留原项目 Apache-2.0 许可证。第三方组件依其各自许可证使用；参赛原创归属仍需另行确认。
-
-## 统一入口
+## 本地运行
 
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python scripts/run.py --input examples/article.md --output output/article.html --theme ai-tech
+.venv/bin/python scripts/run.py --input examples/article.md --output output/article.html
+# 只排版（保留原文措辞）
+.venv/bin/python scripts/run.py --mode format --input examples/article.md --output output/article.html
 .venv/bin/python -m unittest discover -s tests -v
+# 生成一个完整的技能安装包
+.venv/bin/python scripts/package_skill.py
 ```
 
-由宿主 AI 按根 SKILL.md 先生成问题清单与修订稿，再执行本地脚本。脚本不会调用模型，也不会发布文章。科技色使用 ai-tech 主题。
-封面检查为可选项，可追加 `--cover /path/to/cover.png`。命中风格规则、排版失败或 HTML 校验失败均返回非零状态。
+可选 `--theme mist-blue` 或 `--cover /path/to/cover.png`；默认科技色 `ai-tech`。
 
-## 元景参赛待办
+## 项目结构
 
-- 在干净元景环境验证安装、Python依赖、文件读写与子进程能力。
-- 用脱敏样稿验证 AI 核稿和修订，人工标注漏报、误报与事实保真情况。
-- 实测人工处理与技能处理耗时，记录可复现交互；不预填提效比例。
-- 核实独立开发归属与第三方授权，补技能介绍、附件一及3分钟内真实录屏。
-- 当前仓库是开发版，未声明已满足市场上架条件。
+```text
+SKILL.md                 唯一技能入口及四种模式
+scripts/                 统一执行入口、检查、排版与打包
+references/              核稿、改写与排版规则
+assets/themes/           CSS主题
+examples/                脱敏演示样稿
+tests/                   回归测试及样稿
+requirements.txt         Python依赖
+```
+
+## 验证与参赛边界
+
+本地流程不调用网络、不需要发布账号、不上传图片。不能保证技术事实正确、涉密识别或全面合规；HTML检查不等于完成视觉验收。依赖安装需要访问包源。
+元景安装、宿主AI核稿效果、真实提效数据与竞赛录屏尚待验证；不声明已满足市场上架条件。
+
+## 来源
+
+提取并整合自 https://github.com/Aias00/agent-skills ，保留Apache-2.0许可证。第三方依赖各自许可证仍适用；参赛独立开发归属需要另行核实。

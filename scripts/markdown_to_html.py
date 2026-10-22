@@ -63,7 +63,7 @@ class WeChatHTMLConverter:
         if self.theme not in theme_map:
             raise ValueError(f"Unknown theme: {self.theme}. Available: {', '.join(theme_map.keys())}")
 
-        css_file = Path(__file__).parent.parent / 'templates' / theme_map[self.theme]
+        css_file = Path(__file__).parent.parent / 'assets' / 'themes' / theme_map[self.theme]
 
         if not css_file.exists():
             raise FileNotFoundError(f"Theme CSS file not found: {css_file}")

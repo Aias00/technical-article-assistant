@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--mode', choices=['check-format', 'format'], default='check-format')
     parser.add_argument('--input', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--theme', default='ai-tech')
@@ -22,12 +23,13 @@ def main():
     if source == output:
         parser.error('Output must differ from input')
     steps = [
-        ('technical-article-review/scripts/check_banned_scaffolding.py', ['--input', str(source)]),
-        ('wechat-article-formatter/scripts/markdown_to_html.py', ['--input', str(source), '--output', str(output), '--theme', args.theme]),
-        ('technical-article-preflight/scripts/check_html.py', ['--html', str(output)]),
+        ('scripts/markdown_to_html.py', ['--input', str(source), '--output', str(output), '--theme', args.theme]),
+        ('scripts/check_html.py', ['--html', str(output)]),
     ]
+    if args.mode == 'check-format':
+        steps.insert(0, ('scripts/check_banned_scaffolding.py', ['--input', str(source)]))
     if args.cover:
-        steps.append(('technical-article-preflight/scripts/check_cover.py', ['--cover', str(args.cover.resolve())]))
+        steps.append(('scripts/check_cover.py', ['--cover', str(args.cover.resolve())]))
     for script, options in steps:
         result = subprocess.run([sys.executable, str(ROOT / script), *options], check=False)
         if result.returncode:
