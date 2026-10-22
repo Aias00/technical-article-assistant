@@ -316,18 +316,6 @@ class WeChatHTMLConverter:
 
     def convert(self, markdown_text: str) -> str:
         """转换Markdown为HTML"""
-        # ⚠️ 移除 H1 标题（微信公众号有独立的标题输入框）
-        # 删除以 "# " 开头的行（注意：## 和更多 # 的不删除）
-        lines = markdown_text.split('\n')
-        filtered_lines = []
-        for line in lines:
-            # 只删除单个 # 开头的行（H1 标题）
-            if line.strip().startswith('# ') and not line.strip().startswith('## '):
-                continue  # 跳过 H1 标题行
-            filtered_lines.append(line)
-
-        markdown_text = '\n'.join(filtered_lines)
-
         # 移除「副标题：」标签（保留副标题正文）
         markdown_text = self._strip_subtitle_label(markdown_text)
 
@@ -354,6 +342,11 @@ class WeChatHTMLConverter:
         # 转换Markdown为HTML
         md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs)
         html_content = md.convert(markdown_text)
+        # Remove parsed headings, never Markdown lines that may belong to code.
+        soup = BeautifulSoup(html_content, 'html.parser')
+        for heading in soup.find_all('h1'):
+            heading.decompose()
+        html_content = str(soup)
 
         # HTML 兜底：移除可能残留的「副标题：」标签
         html_content = self._strip_subtitle_label_html(html_content)

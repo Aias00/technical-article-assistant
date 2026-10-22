@@ -1,6 +1,6 @@
 ---
 name: technical-article-assistant
-description: 审稿、核稿、润色技术文章及公众号排版，将 Markdown 转微信公众号 HTML。用于技术宣传稿、工程实践和架构分享的 review、polish、Markdown-to-WeChat formatting，交付问题清单、修订稿或排版文件。
+description: 审稿、核稿、润色技术文章及公众号排版，将 Markdown 转微信公众号 HTML。用于技术宣传稿、工程实践和架构分享的 review、polish、Markdown-to-WeChat formatting，可留存来源与代码验证记录，交付问题清单、修订稿或排版文件。
 ---
 
 # 技术文稿核稿与排版助手
@@ -17,6 +17,12 @@ description: 审稿、核稿、润色技术文章及公众号排版，将 Markdo
 | 只排版、原文不要改 | 仅排版 | article.html，保留原文措辞 |
 
 输入是Markdown文件或用户提供的正文；可附目标读者、修改边界、证据、主题和封面。缺省按中文技术分享稿处理。原文保留，所有交付写入独立输出目录；已有同名文件先读取，避免覆盖其他任务产物。
+
+## 来源与验证记录
+
+完整处理或用户要求可追溯稿件包时，按 [稿件包规范](references/article-package.md) 保存sources.md、verification.md和meta.json；简单核稿或仅排版不强制增加文件。来源留存只记录实际读取的资料，版本、源码位置、检索时间与主张对应；另存修订稿时保持图片路径有效。
+
+代码或配置支撑主要结论时，读取 [代码验证规范](references/code-verification.md)：核对固定版本与实际输出，有工具及合适环境时实跑可执行示例；伪代码与不可执行片段分别注明。未执行记not_run，不把静态检查通过当运行验证。
 
 ## 核稿与修订
 
@@ -44,16 +50,24 @@ description: 审稿、核稿、润色技术文章及公众号排版，将 Markdo
 .venv/bin/python scripts/run.py --mode format --input /绝对路径/original.md --output /绝对路径/article.html --theme ai-tech
 ```
 
-`format`跳过文风检查，仍检查HTML结构；不修改Markdown，HTML按公众号正文规则移除元数据和一级标题。默认模式`check-format`依次执行文风检查、排版、HTML检查；可选 `--cover /绝对路径/cover.png`。任何步骤失败都不得交付为通过，已生成文件只能视为中间产物。
+`format`跳过文风检查，仍检查HTML结构；不修改Markdown，HTML按公众号正文规则移除元数据和一级标题。默认模式`check-format`依次执行Markdown本地检查、文风检查、排版、HTML检查；Markdown检查发现缺图或未闭合顶层代码围栏时失败，不下载远端图片，也不运行代码；可选 `--cover /绝对路径/cover.png`。任何步骤失败都不得交付为通过，已生成文件只能视为中间产物。
 
 文风命中需结合上下文判断，不能为了通过而改变事实；无法消除时说明阻塞。完整处理发现未核实的关键事实时，可生成排版草稿，但应在交付说明中明确“待核实”，不能宣称可直接发布。
 
 以上为macOS/Linux命令；Windows使用 `.venv\Scripts\python.exe` 替换解释器路径。科技色默认 `ai-tech`；其他主题和排版限制见 [排版说明](references/formatting.md)。有浏览器能力时检查图片、列表、代码块和主题；未做视觉检查应明确说明。
 
+完整稿件包可另存本地检查报告：
+
+```bash
+.venv/bin/python scripts/inspect_article.py --input /绝对路径/revised.md --output /绝对路径/inspection.json
+```
+
+该报告只证明本地图片存在与顶层围栏闭合，并列出代码块摘要及not_run状态，不证明事实、图片内容或代码正确。
+
 ## 交付与边界
 
 最终列出实际文件位置、修改摘要、检查结果与未解决事项，按模式交付，不能伪造缺失产物。交付公众号HTML时提醒在浏览器复制渲染正文，在公众号后台重新上传并替换本地图片，最后在微信编辑器及手机预览核对标题、图片、代码和样式；未经验证不得宣称粘贴效果一致。
-本技能不发布文章、不上传图片、不执行公众号账号操作；不能保证识别全部技术错误、涉密内容或合规问题。
+目标为腾讯社区或用户要求后续发布时，按 [平台交接说明](references/platform-handoff.md) 准备Markdown和图片，确认实际安装的发布器能力后交接，不把公众号HTML当通用输入。本技能不发布文章、不上传图片、不执行公众号账号操作；不能保证识别全部技术错误、涉密内容或合规问题。
 
 本地脚本读取输入、主题及技能文件，写指定输出，调用包内Python子进程，无需Token或网络。依赖安装需要包源访问，宿主AI的数据处理遵循所在环境规定。使用脱敏数据，不打包凭据。
 

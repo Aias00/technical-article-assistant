@@ -13,6 +13,14 @@
 
 核稿与修订由宿主AI按SKILL.md执行，Python入口只执行本地检查和排版。
 
+## 增强能力
+
+- 来源留存：主张对应官方资料/源码、版本与读取时间。
+- 代码验证记录：区分实跑、静态核对、未执行和伪代码；不会自动执行稿件代码。
+- 本地预检：图片存在性、顶层代码围栏闭合、代码块清单和输入摘要。
+- 平台交接：公众号HTML或修订Markdown交给独立腾讯发布器，不内置登录和提交。
+- 修复代码保真：代码围栏和缩进代码里的`# `注释不会再作为标题删除。
+
 ## 本地运行
 
 ```bash
@@ -22,6 +30,8 @@ python3 -m venv .venv
 # 只排版（保留原文措辞）
 .venv/bin/python scripts/run.py --mode format --input examples/article.md --output output/article.html
 .venv/bin/python -m unittest discover -s tests -v
+# 可追溯的本地检查报告（不执行代码）
+.venv/bin/python scripts/inspect_article.py --input examples/article.md --output output/inspection.json
 # 生成一个完整的技能安装包
 .venv/bin/python scripts/package_skill.py
 ```

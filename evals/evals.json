@@ -53,6 +53,33 @@
       "files": [
         "fixtures/version-claim.md"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "只核稿fixtures/tutorial.md，使用同目录official-api.md作为资料。不执行示例或外部调用，另外给出sources.md和verification.md。",
+      "files": [
+        "fixtures/tutorial.md",
+        "fixtures/official-api.md"
+      ],
+      "assertions": [
+        "台账关联timeout主张及随附资料",
+        "代码验证明确not_run及原因",
+        "不把80%吞吐提升写成已实测",
+        "不生成虚假的日志或执行输出"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "将fixtures/promotion.md核稿并准备腾讯开发者社区交接材料，不发布、不打开浏览器、不生成公众号HTML；输出写临时独立目录。",
+      "files": [
+        "fixtures/promotion.md"
+      ],
+      "assertions": [
+        "交付修订Markdown并说明后续发布器需求",
+        "不运行登录、填表或发布命令",
+        "不伪造文章URL或成功状态",
+        "只引用真实存在的产物"
+      ]
     }
   ]
 }

@@ -28,6 +28,7 @@ def main():
     ]
     if args.mode == 'check-format':
         steps.insert(0, ('scripts/check_banned_scaffolding.py', ['--input', str(source)]))
+        steps.insert(0, ('scripts/inspect_article.py', ['--input', str(source)]))
     if args.cover:
         steps.append(('scripts/check_cover.py', ['--cover', str(args.cover.resolve())]))
     for script, options in steps:
